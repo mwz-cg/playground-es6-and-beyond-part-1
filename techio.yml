@@ -1,0 +1,5 @@
+title: Simple Node.js template
+
+plan:
+  - title: Node.js Snippet
+    statement: statement.md
