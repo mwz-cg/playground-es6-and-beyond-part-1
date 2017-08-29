@@ -152,16 +152,29 @@ return next => action => {
 
 ### Arrow functions and this
 
-Another advantage of arrow functions is that they keep the existing value of `this`.
+Another advantage of arrow functions is that they keep the existing value of `this`. For instance, the following ES5 code does not work:
 
 ```javascript runnable
 let incrementer = {
     sum: 0,
     computeSum: function(values) {
         values.forEach(function(value) {
+            console.log(this);
             this.sum += value;
         });
     }
+};
+
+incrementer.computeSum([1, 2, 3, 4]);
+console.log(incrementer.sum);
+```
+
+That's because in the inner function, `this` is actually `undefined`; the ES6 version works as you would expect:
+
+```javascript runnable
+let incrementer = {
+    sum: 0,
+    computeSum: values => values.forEach(value => this.sum += value)
 };
 
 incrementer.computeSum([1, 2, 3, 4]);
