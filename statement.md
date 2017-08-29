@@ -17,10 +17,13 @@ Anyway, so what changed since that time? Well, JavaScript caught up with other p
 There are two problems with `var`. First, it has function scope even if it is declared in a nested block.
 
 ```javascript runnable
-function problemWithVar() {
+function problemWithVar1() {
     for (var i of [0, 1, 2]) {
     }
     console.log(i);
+}
+
+problemWithVar1();
 ```
 
 This prints `2`. Change `var` to `let` and observe the difference.
@@ -28,13 +31,15 @@ This prints `2`. Change `var` to `let` and observe the difference.
 The second problem is that within a function two declarations of a `var x` will in fact be the same variable. For instance:
 
 ```javascript runnable
-function problemWithVar() {
+function problemWithVar2() {
     var x = 3;
     if (x > 2) {
         var x = 4;
     }
     console.log(x);
 }
+
+problemWithVar2();
 ```
 
 Try to use `let` and see what happens.
