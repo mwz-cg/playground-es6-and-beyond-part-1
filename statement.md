@@ -8,17 +8,48 @@ JavaScript *used to* be considered one of those "lesser" languages, kind of like
 
 This works because JavaScript has implicit type conversion, so it tries to make sense of what it is supposed to do when computing `1 + '2'` for instance, and also in addition to `null`, JavaScript has the `undefined` value that represents the result of an expression that is, well, not defined.
 
+JavaScript has been an international standard since 1997, when it was first standardized as ECMAScript. There are several editions of ECMAScript, and the *n*th edition of ECMAScript is generally abbreviated as ES*n*: ES6 means the sixth edition (published in 2015).
+
+# The not-so-distant past
+
+Starting with ES5 (2009), JavaScript has a *strict mode* that does just what it says, i.e. it disallows things that are considered too lenient.
+TODO examples
+
+ES5 also added higher-order method to arrays. This means that if you wanted to create a new array from another array with values incremented, instead of doing it the old way:
+
+```javascript runnable
+var values = [0, 1, 2, 3];
+var incremented = [];
+for (var i = 0; i < values.length; i++) {
+    incremented.push(values[i] + 1);
+}
+
+console.log(incremented);
+```
+
+You could abstract the iteration away and create a new array using the `map` function:
+
+```javascript runnable
+var values = [0, 1, 2, 3];
+var incremented = values.map(function (element) {
+    return element + 1;
+});
+console.log(incremented);
+```
+
+We will see later in this playground how we can further improve this example.
+
 # The present
 
 Anyway, so what changed since that time? Well, JavaScript caught up with other programming languages, especially with the release of the ECMAScript 6 standard (2015). This version introduced many changes and new features that make JavaScript more powerful and reduce the possibility for unintended behavior. In this playground I list the features that I have found to be the most useful on a daily basis.
 
-## Use `let` not `var`
+## Use `let` and `const`, not `var`
 
-There are two problems with `var`. First, it has function scope even if it is declared in a nested block.
+There are two problems with `var`. First, it has function scope even if it is declared in a nested block. This means that outside the `for` loop below, you can still use the variable `i`.
 
 ```javascript runnable
 function problemWithVar1() {
-    for (var i of [0, 1, 2]) {
+    for (var i = 0; i < 3; i++) {
     }
     console.log(i);
 }
@@ -26,15 +57,16 @@ function problemWithVar1() {
 problemWithVar1();
 ```
 
-This prints `2`. Change `var` to `let` and observe the difference.
+This prints `3`. Change `var` to `let` and observe the difference.
 
-The second problem is that within a function two declarations of a `var x` will in fact be the same variable. For instance:
+The second problem is that within a function two declarations of a `var x` will in fact be the same variable `x`. For instance:
 
 ```javascript runnable
 function problemWithVar2() {
     var x = 3;
     if (x > 2) {
         var x = 4;
+        console.log(x);
     }
     console.log(x);
 }
@@ -42,5 +74,81 @@ function problemWithVar2() {
 problemWithVar2();
 ```
 
-Try to use `let` and see what happens.
+What does this print? Try to replace `var` by `let` and see what happens. Move the `let x = 4;` statement before the `if`, and run the code again.
+
+Note how you are allowed to declare a different variable with the same name as long as it is not in the same scope.
+
+`const` behaves similarly to `let` except that it does not let you assign a different value to the variable. This is referred to as an immutable binding: the binding (association of the value to the identifier) is not mutable, though the value itself is, as illustrated by the code below:
+
+```javascript runnable
+const obj = {x: 3};
+console.log(obj);
+
+// allowed
+obj.x++;
+console.log(obj);
+
+// not allowed
+obj = {x: 5};
+console.log(JSON.stringify(obj));
+```
+
+## Use arrow functions instead of anonymous functions
+
+As you already know, JavaScript has long had first-class support for functions: you can pass functions as arguments to other functions and create functions dynamically. However, the `function ()` syntax can feel a bit clunky, and so-called arrow functions are a nice improvement in syntax. More than that though, by reducing visual burden, they also enable a way of thinking that is traditionally found in functional programming languages.
+
+Our ES5 code for mapping an array by incrementing all values was:
+
+```javascript runnable
+var values = [0, 1, 2, 3];
+var incremented = values.map(function (element) {
+    return element + 1;
+});
+console.log(incremented);
+```
+
+Compare this to the ES6 version:
+
+```javascript runnable
+const values = [0, 1, 2, 3];
+const incremented = values.map(element => element + 1);
+console.log(incremented);
+```
+
+An arrow function can either return an expression directly (as is the case here), or have a normal body with statements if it begins with `{`. This means that if you want to return an object directly you should wrap it in parentheses.
+
+With this new syntax, it becomes much more feasible to *currify* a function, i.e. go from this:
+
+```javascript
+const add = (x, y) => x + y;
+```
+
+to this:
+```javascript
+const add = x => y => x + y;
+```
+
+What is the difference? You can now use the `add` function to increment your elements as follows:
+
+```javascript runnable
+const add = x => y => x + y;
+
+const values = [0, 1, 2, 3];
+const incremented = values.map(add(1));
+console.log(incremented);
+```
+
+This pattern is used in practice, for instance a middleware in Redux will look like this:
+
+```javascript
+return next => action => {
+    // do something with action
+    // ...
+
+    // Call the next dispatch method in the middleware chain.
+    return next(action)
+}
+```
+
+### A word about this
 
