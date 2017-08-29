@@ -150,5 +150,20 @@ return next => action => {
 }
 ```
 
-### A word about this
+### Arrow functions and this
 
+Another advantage of arrow functions is that they keep the existing value of `this`.
+
+```javascript runnable
+let incrementer = {
+    sum: 0,
+    computeSum: function(values) {
+        values.forEach(function(value) {
+            this.sum += value;
+        });
+    }
+};
+
+incrementer.computeSum([1, 2, 3, 4]);
+console.log(incrementer.sum);
+```
