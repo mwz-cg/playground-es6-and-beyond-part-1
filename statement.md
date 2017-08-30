@@ -1,4 +1,4 @@
-# The past
+# Introduction
 
 JavaScript *used to* be considered one of those "lesser" languages, kind of like PHP, that were deemed unsuitable for "real" programming. After all, yes, JavaScript is dynamically typed (the type of a variable is known/can vary at runtime) and is indecently permissive/forgiving. Here are a few things that you can do without having runtime errors:
 - add values of different types (such as numbers and strings),
@@ -6,9 +6,9 @@ JavaScript *used to* be considered one of those "lesser" languages, kind of like
 - reference non-existent properties of an object,
 - call a function with less or more arguments than it expects.
 
-This works because JavaScript has implicit type conversion, so it tries to make sense of what it is supposed to do when computing `1 + '2'` for instance, and also in addition to `null`, JavaScript has the `undefined` value that represents the result of an expression that is, well, not defined.
+This works because JavaScript has implicit type conversion, so it tries to make sense of what it is supposed to do when computing `1 + '2'` for instance. Also, JavaScript has an `undefined` type, which is the type of an expression that is, well, not defined, such as accessing a non-existent property or a missing argument.
 
-JavaScript has been an international standard since 1997, when it was first standardized as ECMAScript. There are several editions of ECMAScript, and the *n*th edition of ECMAScript is generally abbreviated as ES*n*: ES6 means the sixth edition (published in 2015).
+JavaScript has been an international standard since 1997, when it was first standardized as ECMAScript. There are several editions of ECMAScript, and the *n*th edition of ECMAScript is generally abbreviated as ES*n*: ES6 means the sixth edition (published in 2015). We will explore in a series of playgrounds the modern features of the language that will make your code more robust, concise, and easier to read.
 
 # The not-so-distant past (ES5)
 
@@ -69,9 +69,9 @@ console.log(incremented);
 
 We will see later in this playground how we can further improve this example.
 
-# The present
+# The present (ES6)
 
-Anyway, so what changed since that time? Well, JavaScript caught up with other programming languages, especially with the release of the ECMAScript 6 standard (2015). This version introduced many changes and new features that make JavaScript more powerful and reduce the possibility for unintended behavior. In this playground I list the features that I have found to be the most useful on a daily basis.
+With the release of ES6 (2015), JavaScript really caught up with other programming languages. This version introduced many changes and new features that make JavaScript far more powerful, while also fixing a few long-standing issues.
 
 ## Use `let` and `const`, not `var`
 
