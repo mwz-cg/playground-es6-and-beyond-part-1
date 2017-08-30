@@ -1,6 +1,6 @@
 # The past
 
-JavaScript *used to* be considered one of those "lesser" languages, kind of like PHP, that were deemed unsuitable for "real" programming. After all, yes, JavaScript is dynamically typed (the type of a variable is known/can vary at runtime), has implicit type conversion, and on top of that is indecently permissive/forgiving. Here are a few things that you can do without having runtime errors:
+JavaScript *used to* be considered one of those "lesser" languages, kind of like PHP, that were deemed unsuitable for "real" programming. After all, yes, JavaScript is dynamically typed (the type of a variable is known/can vary at runtime) and is indecently permissive/forgiving. Here are a few things that you can do without having runtime errors:
 - add values of different types (such as numbers and strings),
 - use a variable that has not been assigned before,
 - reference non-existent properties of an object,
@@ -22,6 +22,24 @@ Starting with ES5 (2009), JavaScript has a *strict mode* that does just what it 
 - makes the `with` statement a syntax error,
 - forbids having multiple properties/arguments with the same name,
 - no longer coerces `this` to the global object if it is `null` or `undefined`.
+
+This last point is shown below:
+
+```javascript runnable
+function succeeds() {
+    // in non-strict mode, this is the global object...
+    this.console.log('hello');
+}
+
+function fails() {
+    'use strict';
+    // in strict mode, this is undefined here
+    this.console.log('fails');
+}
+
+succeeds();
+fails();
+```
 
 TL;DR you should always `'use strict'` in your code to make it cleaner by not using what are mostly legacy features that have cleaner replacements.
 
@@ -109,11 +127,6 @@ console.log(JSON.stringify(obj));
 
 As you already know, JavaScript has long had first-class support for functions: you can pass functions as arguments to other functions and create functions dynamically. However, the `function ()` syntax can feel a bit clunky, and so-called arrow functions are a nice improvement in syntax. More than that though, by reducing visual burden, they also enable a way of thinking that is traditionally found in functional programming languages.
 
-An arrow function 
-
-An arrow function can either return an expression directly (as is the case here), or have a normal body with statements if it begins with `{`. This means that if you want to return an object directly you should wrap it in parentheses. An arrow function with 0 parameters or more than 1 parameter must have a list of parameters in parentheses.
-
-
 Our ES5 code for mapping an array by incrementing all values was:
 
 ```javascript runnable
@@ -132,18 +145,20 @@ const incremented = values.map(element => element + 1);
 console.log(incremented);
 ```
 
-With this new syntax, it becomes much more feasible to *currify* a function, i.e. go from this:
+An arrow function can either return an expression directly (as is the case here), or have a normal body with statements if it begins with `{`. This means that if you want to return an object directly you should wrap it in parentheses. An arrow function with 0 parameters or more than 1 parameter must have a list of parameters in parentheses:
 
 ```javascript
 const add = (x, y) => x + y;
 ```
+
+Interestingly, with arrow functions it becomes much more feasible to *currify* a function, i.e. transform the `add` function into this:
 
 to this:
 ```javascript
 const add = x => y => x + y;
 ```
 
-What is the difference? You can now use the `add` function to increment your elements as follows:
+What is the difference? You can now use *partial application* to increment elements with `add` as follows:
 
 ```javascript runnable
 const add = x => y => x + y;
@@ -182,9 +197,11 @@ var incrementer = {
         });
     }
 };
+
+incrementer.computeSum([1, 2, 3, 4]);
 ```
 
-That's because in strict mode, `this` is actually `undefined` in the inner function. There are several workarounds: you could create a `self` variable outside of the `forEach` that equals `this`, you could pass `this` as an additional argument to `forEach`, you could `bind` the inner function to `this`, or you can just use ES6:
+That's because in strict mode, `this` is actually `undefined` in the inner function. There are several workarounds: you could create a `self` variable outside of the `forEach` that equals `this`, you could pass `this` as an additional argument to `forEach`, you could `bind` the inner function to `this`, or you can just use an arrow function in ES6:
 
 ```javascript runnable
 'use strict';
@@ -205,9 +222,9 @@ One of JavaScript's great strength is its flexibility when calling functions. Th
 ```javascript runnable
 function cons(item, list) {
     // one of:
-    // list = list || [];
-    // if (arguments.length === 1) { list = []; }
-    // if (list === undefined) { list = []; }
+    list = list || [];
+    // or:
+    // if (arguments.length == 1 || list === undefined) { list = []; }
     list.unshift(item);
     return list;
 }
@@ -231,6 +248,8 @@ console.log(cons(1, cons(2, cons(3, undefined))));
 The default value of a parameter can be another parameter that is declared before it:
 
 ```javascript runnable
+const assert = require('assert');
+
 function multiply(a, b = a) {
     return a * b;
 }
@@ -242,6 +261,8 @@ assert(multiply(5) == 25);
 Finally, `arguments` reflect the arguments that were given to the function, not the arguments that are available after default values have been set:
 
 ```javascript runnable
+const assert = require('assert');
+
 function multiply(a, b = 5) {
     assert arguments.length == 1 && arguments[1] === undefined;
     return a * b;
