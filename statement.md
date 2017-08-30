@@ -10,12 +10,24 @@ This works because JavaScript has implicit type conversion, so it tries to make 
 
 JavaScript has been an international standard since 1997, when it was first standardized as ECMAScript. There are several editions of ECMAScript, and the *n*th edition of ECMAScript is generally abbreviated as ES*n*: ES6 means the sixth edition (published in 2015).
 
-# The not-so-distant past
+# The not-so-distant past (ES5)
 
-Starting with ES5 (2009), JavaScript has a *strict mode* that does just what it says, i.e. it disallows things that are considered too lenient.
-TODO examples
+## Strict mode
 
-ES5 also added higher-order method to arrays. This means that if you wanted to create a new array from another array with values incremented, instead of doing it the old way:
+Starting with ES5 (2009), JavaScript has a *strict mode* that does just what it says, i.e. it disallows things that are considered too lenient. Among other things, strict mode:
+
+- removes legacy octal notation for numbers and escape sequences in strings,
+- restricts the use of `eval` and runs the evaluated code in an isolated environment,
+- restricts the use of `arguments` and disables `caller`/`callee` properties,
+- makes the `with` statement a syntax error,
+- forbids having multiple properties/arguments with the same name,
+- no longer coerces `this` to the global object if it is `null` or `undefined`.
+
+TL;DR you should always `'use strict'` in your code to make it cleaner by not using what are mostly legacy features that have cleaner replacements.
+
+## Higher order functions
+
+ES5 also added higher-order functions to arrays. This means that if you wanted to create a new array from another array with values incremented, instead of doing it the old way:
 
 ```javascript runnable
 var values = [0, 1, 2, 3];
@@ -97,6 +109,11 @@ console.log(JSON.stringify(obj));
 
 As you already know, JavaScript has long had first-class support for functions: you can pass functions as arguments to other functions and create functions dynamically. However, the `function ()` syntax can feel a bit clunky, and so-called arrow functions are a nice improvement in syntax. More than that though, by reducing visual burden, they also enable a way of thinking that is traditionally found in functional programming languages.
 
+An arrow function 
+
+An arrow function can either return an expression directly (as is the case here), or have a normal body with statements if it begins with `{`. This means that if you want to return an object directly you should wrap it in parentheses. An arrow function with 0 parameters or more than 1 parameter must have a list of parameters in parentheses.
+
+
 Our ES5 code for mapping an array by incrementing all values was:
 
 ```javascript runnable
@@ -114,8 +131,6 @@ const values = [0, 1, 2, 3];
 const incremented = values.map(element => element + 1);
 console.log(incremented);
 ```
-
-An arrow function can either return an expression directly (as is the case here), or have a normal body with statements if it begins with `{`. This means that if you want to return an object directly you should wrap it in parentheses.
 
 With this new syntax, it becomes much more feasible to *currify* a function, i.e. go from this:
 
@@ -141,12 +156,14 @@ console.log(incremented);
 This pattern is used in practice, for instance a middleware in Redux will look like this:
 
 ```javascript
-return next => action => {
-    // do something with action
-    // ...
+function myMiddleware() {
+    return next => action => {
+        // do something with action
+        // ...
 
-    // Call the next dispatch method in the middleware chain.
-    return next(action)
+        // Call the next dispatch method in the middleware chain.
+        return next(action)
+    }
 }
 ```
 
@@ -155,23 +172,23 @@ return next => action => {
 Another advantage of arrow functions is that they keep the existing value of `this`. For instance, the following ES5 code does not work:
 
 ```javascript runnable
-let incrementer = {
+'use strict';
+
+var incrementer = {
     sum: 0,
     computeSum: function(values) {
         values.forEach(function(value) {
-            console.log(this);
             this.sum += value;
         });
     }
 };
-
-incrementer.computeSum([1, 2, 3, 4]);
-console.log(incrementer.sum);
 ```
 
-That's because in the inner function, `this` is actually `undefined`; the ES6 version works as you would expect:
+That's because in strict mode, `this` is actually `undefined` in the inner function. There are several workarounds: you could create a `self` variable outside of the `forEach` that equals `this`, you could pass `this` as an additional argument to `forEach`, you could `bind` the inner function to `this`, or you can just use ES6:
 
 ```javascript runnable
+'use strict';
+
 let incrementer = {
     sum: 0,
     computeSum: values => values.forEach(value => this.sum += value)
@@ -179,4 +196,56 @@ let incrementer = {
 
 incrementer.computeSum([1, 2, 3, 4]);
 console.log(incrementer.sum);
+```
+
+## Use default arguments
+
+One of JavaScript's great strength is its flexibility when calling functions. There is no such thing as a function signature: you can call a function with fewer or more arguments than it declares. Optional arguments have been supported since day one, but before ES6 they required boilerplate code such as:
+
+```javascript runnable
+function cons(item, list) {
+    // one of:
+    // list = list || [];
+    // if (arguments.length === 1) { list = []; }
+    // if (list === undefined) { list = []; }
+    list.unshift(item);
+    return list;
+}
+
+console.log(cons(1, cons(2, cons(3))));
+console.log(cons(1, cons(2, cons(3, undefined))));
+```
+
+Now instead you can simply use default parameters:
+
+```javascript runnable
+function cons(item, list = []) {
+    list.unshift(item);
+    return list;
+}
+
+console.log(cons(1, cons(2, cons(3))));
+console.log(cons(1, cons(2, cons(3, undefined))));
+```
+
+The default value of a parameter can be another parameter that is declared before it:
+
+```javascript runnable
+function multiply(a, b = a) {
+    return a * b;
+}
+
+assert(multiply(3, 4) == 12);
+assert(multiply(5) == 25);
+```
+
+Finally, `arguments` reflect the arguments that were given to the function, not the arguments that are available after default values have been set:
+
+```javascript runnable
+function multiply(a, b = 5) {
+    assert arguments.length == 1 && arguments[1] === undefined;
+    return a * b;
+}
+
+assert(multiply(3) == 15);
 ```
