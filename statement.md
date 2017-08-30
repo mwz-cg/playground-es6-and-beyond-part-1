@@ -270,3 +270,21 @@ function multiply(a, b = 5) {
 
 assert(multiply(3) == 15);
 ```
+
+## Template literals
+
+```javascript runnable
+let who = {
+    valueOf: () => {
+        console.log('valueOf called');
+        return 'world';
+    },
+    toString: () => {
+        console.log('toString called');
+        return 'world';
+    }
+};
+
+let temp = `hello ${who}`;
+console.log(temp);
+```
