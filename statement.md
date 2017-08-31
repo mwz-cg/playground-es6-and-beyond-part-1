@@ -16,7 +16,7 @@ JavaScript has been an international standard since 1997, when it was first stan
 
 Starting with ES5 (2009), JavaScript has a *strict mode* that does just what it says, i.e. it disallows things that are considered too lenient. Among other things, strict mode:
 
-- removes legacy octal notation for numbers and escape sequences in strings,
+- removes legacy octal notation for numbers and octal escape sequences in strings,
 - restricts the use of `eval` and runs the evaluated code in an isolated environment,
 - restricts the use of `arguments` and disables `caller`/`callee` properties,
 - makes the `with` statement a syntax error,
@@ -71,9 +71,7 @@ We will see later in this playground how we can further improve this example.
 
 # The present (ES6)
 
-With the release of ES6 (2015), JavaScript really caught up with other programming languages. This version introduced many changes and new features that make JavaScript far more powerful, while also fixing a few long-standing issues.
-
-ES6 is now supported natively in the four major browsers: Chrome, Edge, Firefox, Safari. The only mainstream browser not supporting ES6 is... Internet Explorer 11, (unfortunately) still maintained by Microsoft to this day.
+With the release of ES6 (2015), JavaScript really caught up with other programming languages. This version introduced many changes and new features that make JavaScript far more powerful, while also fixing a few long-standing issues. ES6 is now supported natively in the four major browsers: Chrome, Edge, Firefox, Safari. The only mainstream browser not supporting ES6 is... Internet Explorer 11, (unfortunately) still maintained by Microsoft to this day.
 
 ## Use `let` and `const`, not `var`
 
@@ -110,7 +108,7 @@ What does this print? Try to replace `var` by `let` and see what happens. Move t
 
 Note how you are allowed to declare a different variable with the same name as long as it is not in the same scope.
 
-`const` behaves similarly to `let` except that it does not let you assign a different value to the variable. This is referred to as an immutable binding: the binding (association of the value to the identifier) is not mutable, though the value itself is, as illustrated by the code below:
+`const` behaves similarly to `let` except that it does not let you assign a different value to the variable. This is referred to as an *immutable binding*: the binding (association of the value to the identifier) is not mutable, though the value itself is, as illustrated by the code below:
 
 ```javascript runnable
 const obj = {x: 3};
@@ -153,9 +151,8 @@ An arrow function can either return an expression directly (as is the case here)
 const add = (x, y) => x + y;
 ```
 
-Interestingly, with arrow functions it becomes much more feasible to *currify* a function, i.e. transform the `add` function into this:
+Interestingly, with arrow functions it becomes much more feasible to *currify* a function, i.e. rewrite the `add` function as follows:
 
-to this:
 ```javascript
 const add = x => y => x + y;
 ```
@@ -203,19 +200,23 @@ var incrementer = {
 incrementer.computeSum([1, 2, 3, 4]);
 ```
 
-That's because in strict mode, `this` is actually `undefined` in the inner function. There are several workarounds: you could create a `self` variable outside of the `forEach` that equals `this`, you could pass `this` as an additional argument to `forEach`, you could `bind` the inner function to `this`, or you can just use an arrow function in ES6:
+That's because in strict mode, `this` is actually `undefined` in the inner function. There are several workarounds: you could assign `this` to a `self` variable before the call to `forEach`, you could pass `this` as an additional argument to `forEach`, you could `bind` the inner function to `this`, or you can just use an arrow function in ES6:
 
 ```javascript runnable
 'use strict';
 
 let incrementer = {
     sum: 0,
-    computeSum: values => values.forEach(value => this.sum += value)
+    computeSum: function(values) {
+        values.forEach(value => this.sum += value);
+    }
 };
 
 incrementer.computeSum([1, 2, 3, 4]);
 console.log(incrementer.sum);
 ```
+
+Note how we used an anonymous function for computeSum rather than an arrow function so that we have the proper `this`.
 
 ## Alternatives to `arguments`
 
@@ -241,7 +242,7 @@ console.log(cons(1, cons(2, cons(3))));
 console.log(cons(1, cons(2, cons(3, undefined))));
 ```
 
-Now instead you can simply use default parameters:
+Now you can simply use default parameters instead:
 
 ```javascript runnable
 function cons(item, list = []) {
@@ -311,38 +312,46 @@ Template literals are basically super strings. The primary use of template liter
 ```javascript runnable
 const assert = require('assert');
 
-var textES5 = 'This is a long text that\
+let textES5 = 'This is a long text that\n\
 spans over multiple lines.';
 
 let textES6 = `This is a long text that
 spans over multiple lines.`;
 
 assert(textES5 === textES6);
+console.log(textES6);
 
 let person = {
     firstName: 'Sarah',
     lastName: 'Connor'
 };
-var greetingES5 = 'Hello ' + person.firstName + ' ' + person.lastName.toUppercase() + '!';
-let greetingES6 = `Hello ${person.firstName} ${person.lastName.toUppercase()}!`;
+let greetingES5 = 'Hello ' + person.firstName + ' ' + person.lastName.toUpperCase() + '!';
+let greetingES6 = `Hello ${person.firstName} ${person.lastName.toUpperCase()}!`;
 
 assert(greetingES5 === greetingES6);
+console.log(greetingES6);
+```
 
+String concatenation in a template string behaves like `String.prototype.concat` rather than the `+` operator. This means that in a template literal, an expression is converted to a string using `toString` (and if not present, `valueOf`), whereas with the `+` operator the order is reversed.
+
+```javascript runnable
 let who = {
-    valueOf: () => {
-        console.log('valueOf called');
+    valueOf: function() {
+        console.log('valueOf called (concatenation)');
         return 'world';
     },
-    toString: () => {
-        console.log('toString called');
+    toString: function() {
+        console.log('toString called (template string)');
         return 'world';
     }
 };
 
-let temp = 'hello ' + who;
-console.log(temp);
+let helloES5 = 'hello ' + who;
+let helloES6 = `hello ${who}`;
+
+assert(helloES5 === helloES6);
 ```
 
-# Next
+# What's next?
 
-In the next part, we will see improved object literals, the for-of loop, destructuring in declarations and assignements, and talk more about using the `...` spread operator.
+In part 2, we will see improved object literals, the for-of loop, destructuring in declarations and assignements, and talk more about using the `...` spread operator.
