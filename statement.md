@@ -73,6 +73,8 @@ We will see later in this playground how we can further improve this example.
 
 With the release of ES6 (2015), JavaScript really caught up with other programming languages. This version introduced many changes and new features that make JavaScript far more powerful, while also fixing a few long-standing issues.
 
+ES6 is now supported natively in the four major browsers: Chrome, Edge, Firefox, Safari. The only mainstream browser not supporting ES6 is... Internet Explorer 11, (unfortunately) still maintained by Microsoft to this day.
+
 ## Use `let` and `const`, not `var`
 
 There are two problems with `var`. First, it has function scope even if it is declared in a nested block. This means that outside the `for` loop below, you can still use the variable `i`.
@@ -215,16 +217,22 @@ incrementer.computeSum([1, 2, 3, 4]);
 console.log(incrementer.sum);
 ```
 
-## Use default arguments
+## Alternatives to `arguments`
 
-One of JavaScript's great strength is its flexibility when calling functions. There is no such thing as a function signature: you can call a function with fewer or more arguments than it declares. Optional arguments have been supported since day one, but before ES6 they required boilerplate code such as:
+One of JavaScript's great strength is its flexibility when calling functions. To the caller, a function signature is mostly indicative: you can call a function with fewer or more arguments than it declares, and it will work fine. In fact it enables interesting APIs with functions that do different things depending on the number and types of arguments they are given.
+
+The problem is that until ES6 you often had to manipulate the special `arguments` variable for that, even in simple cases. ES6 adds two features that let you specify function signatures stating your intent more clearly and often let you get away without using `arguments`.
+
+### Default parameters
+
+Optional arguments have been supported since day one in JavaScript, but before ES6 they required boilerplate code such as:
 
 ```javascript runnable
 function cons(item, list) {
     // one of:
     list = list || [];
     // or:
-    // if (arguments.length == 1 || list === undefined) { list = []; }
+    // if (arguments.length === 1 || list === undefined) { list = []; }
     list.unshift(item);
     return list;
 }
@@ -254,26 +262,72 @@ function multiply(a, b = a) {
     return a * b;
 }
 
-assert(multiply(3, 4) == 12);
-assert(multiply(5) == 25);
+assert(multiply(3, 4) === 12);
+assert(multiply(5) === 25);
 ```
 
-Finally, `arguments` reflect the arguments that were given to the function, not the arguments that are available after default values have been set:
+### Rest parameters
+
+Default parameters work well for functions with a fixed number of parameters, but for functions that accept a variable number of parameters you need rest parameters.
+
+For instance, assume you want to sum numbers with an initial number (optional, default to zero), in ES5 you would write something like this:
+
+```javascript runnable
+function sum(init) {
+    if (init === undefined) {
+        init = 0;
+    }
+
+    // FIXME: var args = Array.prototype.slice.call(arguments, sum.length);
+    var args = arguments.slice(sum.length);
+    return args.reduce(function (acc, value) {
+        return acc + value;
+    }, init);
+}
+
+console.log(sum());
+console.log(sum(3));
+console.log(sum(1, 2, 3, 4));
+```
+
+Note that the `arguments` is not even a real array, so the example fails to compile. Fix the code to make it compile.
+
+Now with ES6 this code becomes:
+
+```javascript runnable
+const sum = (init = 0, ...values) => values.reduce((acc, value) => acc + value, init);
+
+console.log(sum());
+console.log(sum(3));
+console.log(sum(1, 2, 3, 4));
+```
+
+The `...values` rest parameter must be the last parameter of the function (or the only one). It is an array of arguments that were given to the function after preceding parameters (if any). The `...` operator is called the *spread operator*. We will see in part 2 more advanced use of rest parameters with destructuring.
+
+## Template literals
+
+Template literals are basically super strings. The primary use of template literals is to create a string from a template string and expressions that are evaluated and concatenated together. A template literal can also contain newlines without the need to escape them. Compare the following examples:
 
 ```javascript runnable
 const assert = require('assert');
 
-function multiply(a, b = 5) {
-    assert arguments.length == 1 && arguments[1] === undefined;
-    return a * b;
-}
+var textES5 = 'This is a long text that\
+spans over multiple lines.';
 
-assert(multiply(3) == 15);
-```
+let textES6 = `This is a long text that
+spans over multiple lines.`;
 
-## Template literals
+assert(textES5 === textES6);
 
-```javascript runnable
+let person = {
+    firstName: 'Sarah',
+    lastName: 'Connor'
+};
+var greetingES5 = 'Hello ' + person.firstName + ' ' + person.lastName.toUppercase() + '!';
+let greetingES6 = `Hello ${person.firstName} ${person.lastName.toUppercase()}!`;
+
+assert(greetingES5 === greetingES6);
+
 let who = {
     valueOf: () => {
         console.log('valueOf called');
@@ -285,6 +339,10 @@ let who = {
     }
 };
 
-let temp = `hello ${who}`;
+let temp = 'hello ' + who;
 console.log(temp);
 ```
+
+# Next
+
+In the next part, we will see improved object literals, the for-of loop, destructuring in declarations and assignements, and talk more about using the `...` spread operator.
