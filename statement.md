@@ -337,19 +337,20 @@ String concatenation in a template string behaves like `String.prototype.concat`
 ```javascript runnable
 let who = {
     valueOf: function() {
-        console.log('valueOf called (concatenation)');
+        console.log('valueOf called');
         return 'world';
     },
     toString: function() {
-        console.log('toString called (template string)');
+        console.log('toString called');
         return 'world';
     }
 };
 
-let helloES5 = 'hello ' + who;
-let helloES6 = `hello ${who}`;
+let helloPlus = 'hello ' + who;
+let helloTemplate = `hello ${who}`;
 
-assert(helloES5 === helloES6);
+console.log(helloPlus);
+console.log(helloTemplate);
 ```
 
 # What's next?
