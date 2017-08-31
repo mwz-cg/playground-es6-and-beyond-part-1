@@ -279,8 +279,7 @@ function sum(init) {
         init = 0;
     }
 
-    // FIXME: var args = Array.prototype.slice.call(arguments, sum.length);
-    var args = arguments.slice(sum.length);
+    var args = Array.prototype.slice.call(arguments, sum.length);
     return args.reduce(function (acc, value) {
         return acc + value;
     }, init);
@@ -291,7 +290,7 @@ console.log(sum(3));
 console.log(sum(1, 2, 3, 4));
 ```
 
-Note that the `arguments` is not even a real array, so the example fails to compile. Fix the code to make it compile.
+Note that you cannot call `slice` directly on `arguments` because it is not a real Array object.
 
 Now with ES6 this code becomes:
 
