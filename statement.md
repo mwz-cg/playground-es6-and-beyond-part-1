@@ -220,7 +220,7 @@ Note how we used an anonymous function for computeSum rather than an arrow funct
 
 ## Alternatives to `arguments`
 
-One of JavaScript's great strength is its flexibility when calling functions. To the caller, a function signature is mostly indicative: you can call a function with fewer or more arguments than it declares, and it will work fine. In fact it enables interesting APIs with functions that do different things depending on the number and types of arguments they are given.
+One of JavaScript's great strengths is its flexibility when calling functions. To the caller, a function signature is mostly indicative: you can call a function with fewer or more arguments than it declares, and it will work fine. In fact it enables interesting APIs with functions that do different things depending on the number and types of arguments they are given.
 
 The problem is that until ES6 you often had to manipulate the special `arguments` variable for that, even in simple cases. ES6 adds two features that let you specify function signatures stating your intent more clearly and often let you get away without using `arguments`.
 
