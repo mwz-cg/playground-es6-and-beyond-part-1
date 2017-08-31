@@ -120,7 +120,7 @@ console.log(obj);
 
 // not allowed
 obj = {x: 5};
-console.log(JSON.stringify(obj));
+console.log(obj);
 ```
 
 ## Use arrow functions instead of anonymous functions
