@@ -10,6 +10,14 @@ This works because JavaScript has implicit type conversion, so it tries to make 
 
 JavaScript has been an international standard since 1997, when it was first standardized as ECMAScript. There are several editions of ECMAScript, and the *n*th edition of ECMAScript is generally abbreviated as ES*n*: ES6 means the sixth edition (published in 2015). We will explore in a series of playgrounds the modern features of the language that will make your code more robust, concise, and easier to read.
 
+In this playground, you will read about:
+
+- [`let`/`const`](#let-const)
+- [arrow functions](#arrow-functions)
+- [default parameters](#default-parameters)
+- [rest parameters](#rest-parameters)
+- [template literals](#template-literals)
+
 # The not-so-distant past (ES5)
 
 ## Strict mode
@@ -73,7 +81,7 @@ We will see later in this playground how we can further improve this example.
 
 With the release of ES6 (2015), JavaScript really caught up with other programming languages. This version introduced many changes and new features that make JavaScript far more powerful, while also fixing a few long-standing issues. ES6 is now supported natively in the four major browsers: Chrome, Edge, Firefox, Safari. The only mainstream browser not supporting ES6 is... Internet Explorer 11, (unfortunately) still maintained by Microsoft to this day.
 
-## Use `let` and `const`, not `var`
+## <a name="let-const"></a> Use `let` and `const`, not `var`
 
 There are two problems with `var`. First, it has function scope even if it is declared in a nested block. This means that outside the `for` loop below, you can still use the variable `i`.
 
@@ -123,7 +131,7 @@ obj = {x: 5};
 console.log(obj);
 ```
 
-## Use arrow functions instead of anonymous functions
+## <a name="arrow-functions"></a> Use arrow functions instead of anonymous functions
 
 As you already know, JavaScript has long had first-class support for functions: you can pass functions as arguments to other functions and create functions dynamically. However, the `function ()` syntax can feel a bit clunky, and so-called arrow functions are a nice improvement in syntax. More than that though, by reducing visual burden, they also enable a way of thinking that is traditionally found in functional programming languages.
 
@@ -218,7 +226,7 @@ console.log(incrementer.sum);
 
 Note how we used an anonymous function for computeSum rather than an arrow function so that we have the proper `this`.
 
-## Alternatives to `arguments`
+## <a name="default-parameters"></a> Alternatives to `arguments`
 
 One of JavaScript's great strengths is its flexibility when calling functions. To the caller, a function signature is mostly indicative: you can call a function with fewer or more arguments than it declares, and it will work fine. In fact it enables interesting APIs with functions that do different things depending on the number and types of arguments they are given.
 
@@ -267,7 +275,7 @@ assert(multiply(3, 4) === 12);
 assert(multiply(5) === 25);
 ```
 
-### Rest parameters
+### <a name="rest-parameters"></a> Rest parameters
 
 Default parameters work well for functions with a fixed number of parameters, but for functions that accept a variable number of parameters you need rest parameters.
 
@@ -304,7 +312,7 @@ console.log(sum(1, 2, 3, 4));
 
 The `...values` rest parameter must be the last parameter of the function (or the only one). It is an array of arguments that were given to the function after preceding parameters (if any). The `...` operator is called the *spread operator*. We will see in part 2 more advanced use of rest parameters with destructuring.
 
-## Template literals
+## <a name="template-literals"></a> Template literals
 
 Template literals are basically super strings. The primary use of template literals is to create a string from a template string and expressions that are evaluated and concatenated together. A template literal can also contain newlines without the need to escape them. Compare the following examples:
 
@@ -336,21 +344,21 @@ String concatenation in a template string behaves like `String.prototype.concat`
 ```javascript runnable
 let who = {
     valueOf: function() {
-        console.log('valueOf called');
-        return 'world';
+        return 'world (from valueOf)';
     },
     toString: function() {
-        console.log('toString called');
-        return 'world';
+        return 'world (from toString)';
     }
 };
 
 let helloPlus = 'hello ' + who;
-let helloTemplate = `hello ${who}`;
-
 console.log(helloPlus);
+
+let helloTemplate = `hello ${who}`;
 console.log(helloTemplate);
 ```
+
+Try to remove `valueOf` or `toString` and run the code again to see the differences.
 
 # What's next?
 
