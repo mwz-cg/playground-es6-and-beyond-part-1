@@ -153,19 +153,44 @@ const incremented = values.map(element => element + 1);
 console.log(incremented);
 ```
 
-An arrow function can either return an expression directly (as is the case here), or have a normal body with statements if it begins with `{`. This means that if you want to return an object directly you should wrap it in parentheses. An arrow function with 0 parameters or more than 1 parameter must have a list of parameters in parentheses:
+An arrow function can either return an expression directly (as is the case here), or have a normal body with statements if it begins with `{`. This means that if you want to return an object directly you should wrap it in parentheses. An arrow function with 0 parameters or more than 1 parameter must have a list of parameters in parentheses. For example an `add` function defined in ES5 as follows:
 
 ```javascript
+var add = function(x, y) {
+    return x + y;
+};
+```
+
+can be written in ES6 with an arrow function as:
+
+```javascript runnable
 const add = (x, y) => x + y;
+
+console.log('sum of 1 + 2 =', add(1, 2));
 ```
 
-Interestingly, with arrow functions it becomes much more feasible to *currify* a function, i.e. rewrite the `add` function as follows:
+Note the use of `const` here to prevent the `add` variable from being reassigned. Interestingly, with arrow functions it becomes much more feasible to create functions in *curried* form, i.e. to transform a function taking multiple arguments into multiple nested functions taking one argument each, with the innermost function doing the actual computation. Currying the `add` function leads to:
+
+In ES5:
 
 ```javascript
-const add = x => y => x + y;
+var add = function(x) {
+    return function(y) {
+        return x + y;
+    };
+};
 ```
 
-What is the difference? You can now use *partial application* to increment elements with `add` as follows:
+In ES6:
+
+```javascript runnable
+const add = x => y => x + y;
+
+// note the difference with the previous definition: add(1, 2) has become add(1)(2)
+console.log('sum of 1 + 2 =', add(1)(2));
+```
+
+The advantage of working with curried functions is that you can use *partial application*. This means supplying the function with fewer arguments than necessary. We use partial application to increment elements with `add` as follows:
 
 ```javascript runnable
 const add = x => y => x + y;
